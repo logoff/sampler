@@ -3,14 +3,61 @@ go:
   - 1.12.x
   - master
 os:
-  - linux
   - osx
+  - windows
 addons:
   apt:
     packages:
       - libasound2-dev
-dist: trusty
-sudo: false
+jobs:
+  include:
+    - name: linux x86 64-bit // go 1.12.x
+      os: linux
+      go: 1.12.x
+      env: BASE_IMAGE=x86_64-linux
+    - name: linux x86 32-bit // go 1.12.x
+      os: linux
+      go: 1.12.x
+      env: BASE_IMAGE=i386/ubuntu
+    - name: ARM 64-bit // go 1.12.x
+      os: linux
+      go: 1.12.x
+      env: BASE_IMAGE=arm64v8/ubuntu
+    - name: ARM 32-bit // go 1.12.x
+      os: linux
+      go: 1.12.x
+      env: BASE_IMAGE=arm32v7/ubuntu
+    - name: linux x86 64-bit // go master
+      os: linux
+      go: master
+      env:
+        - BASE_IMAGE=x86_64-linux
+    - name: linux x86 32-bit // go master
+      os: linux
+      go: master
+      env:
+        - BASE_IMAGE=i386/ubuntu
+    - name: ARM 64-bit // go master
+      os: linux
+      go: master
+      env:
+        - BASE_IMAGE=arm64v8/ubuntu
+    - name: ARM 32-bit // go master
+      os: linux
+      go: master
+      env:
+        - BASE_IMAGE=arm32v7/ubuntu
+before_install:
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ];
+    then
+      # Show environment
+      uname -a
+      id
+      pwd
+      # Use QEMU Docker image for multi-arch builds
+      docker run --rm --privileged multiarch/qemu-user-static --reset -p yes;
+    fi;
 install: true
 script:
   - env GO111MODULE=on go build
